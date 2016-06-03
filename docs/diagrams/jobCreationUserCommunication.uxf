@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.1.1">
+  <zoom_level>10</zoom_level>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>120</x>
+      <y>0</y>
+      <w>1103</w>
+      <h>1491</h>
+    </coordinates>
+    <panel_attributes>title:Vytvoření stahování množiny spekter
+Start
+Čekání na metodu zadání VOT&gt;
+&gt;Uživatel vybral metodu zadání VOT
+If
+	[URL zadání]
+	While[download failed]
+		Zobrazení pole k zadání URL
+		Čekání na zadání URL&gt;
+		&gt;Uživatel zadal URL a potvrdil stažení
+		Stažení souboru VOT dle URL
+	[download success]
+	
+	[Upload VOT]
+	Zobrazení dialogu k výběru souboru
+	Čekání na výběr souboru&gt;
+	&gt;Soubor vybrán
+	Upload souboru
+
+	[Přímé vložení VOT]
+	Zobrazení formuláře k vložení
+	Čekání na vložení&gt;
+	&gt;VOT vložen a volba potvrzena
+
+Parsování VOT dokumentu
+Zobrazen výsledek parsování\-resource URL\-query status\-document size\-record count\-datalink availability\-datalink access URL
+If
+	[datalink available]
+	Zobrazení možností datalinku
+
+	[datalink unavailable]
+EndIf
+Zobrazení možností autorizace
+Vykreslení formuláře výběru adresáře
+Čekání na výběr cílového adresáře&gt;
+&gt;Uživatel vybral cílový adresář
+Zobrazení rekapitulace
+Čekání na potvrzení stahování&gt;
+&gt;Uživatel potvrdil stahování
+Zahájení stahování
+End
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
