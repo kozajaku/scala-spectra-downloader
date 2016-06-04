@@ -32,7 +32,8 @@ class CreateNewJobController @Inject()(implicit actorSystem: ActorSystem, materi
     (resolverActor ? VotableByDownload(text)).mapTo[ResolverResponse].map {
       case ParsingSuccess(votable) =>
         val downloadingActor = actorSystem.actorOf(SpectraDownloadingActor.props)
-        downloadingActor ! SpectraDownloadingActor.InitiateDownloading(votable, SpectraDownloadConfiguration(Directory("some"), None, Option(DatalinkConfig(List("test" -> "value")))))
+        downloadingActor ! SpectraDownloadingActor.InitiateDownloading(votable,
+          SpectraDownloadConfiguration(Directory("outputDir"), None, /*Option(DatalinkConfig(List("test" -> "value")))*/ None))
         Ok(votable.getQueryStatus)
       case s:ResolverFailed =>
         InternalServerError("Failed")
