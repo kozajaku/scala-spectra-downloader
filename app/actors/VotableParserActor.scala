@@ -23,10 +23,8 @@ class VotableParserActor extends Actor {
       try {
         val parsedVotable: IndexedSSAPVotable = VotableParser.parseVotable(votable)
         sender() ! VotableResolverActor.ParsingSuccess(parsedVotable)
-        println("success: " + parsedVotable)
       } catch {
         case e: UnparseableVotableException => sender() ! VotableResolverActor.ParsingFailed
-        println("unparseable")
       }
   }
 

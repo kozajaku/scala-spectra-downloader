@@ -1,9 +1,11 @@
 package controllers
 
 import javax.inject._
-import akka.actor.{ActorRef, ActorSystem}
+import actors.SpectraDownloadingActor
+import akka.actor.{PoisonPill, ActorRef, ActorSystem}
 import akka.stream.Materializer
 import play.api.mvc._
+import utils.model.{SpectraDownloadConfiguration, Directory, DatalinkConfig, Authorization}
 
 import scala.concurrent.ExecutionContext
 
@@ -20,15 +22,20 @@ class CreateNewJobController @Inject()(implicit actorSystem: ActorSystem, materi
 
   implicit val timeout = Timeout(5.seconds)
 
-  val resolverActor: ActorRef = actorSystem.actorOf(VotableResolverActor.props)
 
   def test = Action.async { request =>
     import actors.VotableResolverActor._
+    val resolverActor: ActorRef = actorSystem.actorOf(VotableResolverActor.props)
 
     val body = request.body
     val text = body.asText.getOrElse("invalid")
-    (resolverActor ? VotableByDownload(text)).mapTo[ParsingSuccess].map {
-      result => Ok(result.votable.getQueryStatus())
+    (resolverActor ? VotableByDownload(text)).mapTo[ResolverResponse].map {
+      case ParsingSuccess(votable) =>
+        val downloadingActor = actorSystem.actorOf(SpectraDownloadingActor.props)
+        downloadingActor ! SpectraDownloadingActor.InitiateDownloading(votable, SpectraDownloadConfiguration(Directory("some"), None, Option(DatalinkConfig(List("test" -> "value")))))
+        Ok(votable.getQueryStatus)
+      case s:ResolverFailed =>
+        InternalServerError("Failed")
     }
   }
 }
