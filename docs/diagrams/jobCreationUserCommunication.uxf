@@ -7,7 +7,7 @@
       <x>120</x>
       <y>0</y>
       <w>1103</w>
-      <h>1491</h>
+      <h>1475</h>
     </coordinates>
     <panel_attributes>title:Vytvoření stahování množiny spekter
 Start
@@ -34,7 +34,7 @@ If
 	&gt;VOT vložen a volba potvrzena
 
 Parsování VOT dokumentu
-Zobrazen výsledek parsování\-resource URL\-query status\-document size\-record count\-datalink availability\-datalink access URL
+Zobrazen výsledek parsování\-resource URL\-query status\-record count\-datalink availability\-datalink access URL
 If
 	[datalink available]
 	Zobrazení možností datalinku

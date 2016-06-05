@@ -23,3 +23,7 @@ span.stateRunning {
 #createNewJob {
 
 }
+
+.hidden {
+    display: none;
+}

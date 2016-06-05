@@ -7,6 +7,9 @@
         @job.votableSource
     </td>
     <td>
+        @job.created.format("HH:mm:ss")
+    </td>
+    <td>
         @job.recordsCount
     </td>
     <td>
@@ -28,6 +31,9 @@
             <tr class="headerRow">
                 <th>
                     URL
+                </th>
+                <th>
+                    Created
                 </th>
                 <th>
                     Records count

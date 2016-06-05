@@ -1,0 +1,131 @@
+@()
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+    <head>
+        <title>Spectra downloader</title>
+        <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script>
+                var currentVotableSession;
+                function displayParsedData(json){
+                    $("#parsedVotable").removeClass("hidden");
+                    //set status
+                    if (json.status == "ok"){
+                        currentVotableSession = json.id;
+                        $("#parsingStatus").text("OK");
+                        $(".okStatusValue").removeClass("hidden");
+                    } else {
+                        $("#parsingStatus").text(json.message);
+                        $(".okStatusValue").addClass("hidden");
+                        return;
+                    }
+                    //resource url
+                    var url = $("#resourceUrl");
+                    if (!json.url){
+                        url.text("Not available");
+                    } else {
+                        url.text(json.url);
+                    }
+                    //records count
+                    $("#recordsCount").text(json.recordCount);
+                    //datalink availability
+                    $("#datalinkAvailable").text(json.datalinkAvailable ? "yes" : "no");
+                }
+                //on document ready ask for job states
+                $(function(){
+                    $("input[type=radio][name=choice]").first().prop("checked", true);
+                    function hideAll(){
+                        $("#selectionUrl").addClass("hidden");
+                        $("#selectionUpload").addClass("hidden");
+                        $("#selectionDirect").addClass("hidden");
+                    }
+                    //radio selection change
+                    $('input[type=radio][name=choice]').on('change', function() {
+                        hideAll();
+                        switch($(this).val()) {
+                            case 'url':
+                                $("#selectionUrl").removeClass("hidden");
+                                break;
+                            case 'upload':
+                                $("#selectionUpload").removeClass("hidden");
+                                break;
+                            case 'direct':
+                                $("#selectionDirect").removeClass("hidden");
+                                break;
+                        }
+                    });
+                    //url download submit event
+                    $("#urlSubmit").click(function(){
+                        $.ajax({
+                            type: "POST",
+                            url: "@routes.CreateNewJobController.downloadVotable",
+                            data: $("#selectionUrl input").val().trim(),
+                            contentType: "text/plain"
+                        }).done(function(json){
+                            displayParsedData(json);
+                        }).fail(function(data){
+                            displayParsedData(data.responseJSON);
+                        });
+                    });
+                    //direct votable input submit event
+                    $("#directSubmit").click(function(){
+                        $.ajax({
+                            type: "POST",
+                            url: "@routes.CreateNewJobController.directVotableInput",
+                            data: $("#votableArea").val().trim(),
+                            contentType: "text/plain"
+                        }).done(function(json){
+                            displayParsedData(json);
+                        }).fail(function(data){
+                            displayParsedData(data.responseJSON);
+                        });
+                    });
+                });
+        </script>
+    </head>
+    <body>
+        @* And here's where we render the `Html` object containing
+        * the page content. *@
+        <h1>Create new download job</h1>
+        <div id="methodChoice">
+            <h2>
+                Choose VOTABLE source
+            </h2>
+            <form id="inputs">
+                <input name="choice" type="radio" value="url" checked>Download from URL<br/>
+                <input name="choice" type="radio" value="upload" disabled>VOTABLE Upload<br/>
+                <input name="choice" type="radio" value="direct">Direct VOTABLE input
+            </form>
+        </div>
+        <div id="selectionUrl">
+            Resource URL: <input type="text" size="70" /><br/>
+            <input type="button" id="urlSubmit" value="Download VOTABLE" />
+        </div>
+        <div class="hidden" id="selectionUpload">
+            upload TODO
+        </div>
+        <div class="hidden" id="selectionDirect">
+            Insert VOTABLE document:<br/>
+            <textarea id="votableArea" type="textarea" cols="80" rows="20"></textarea><br/>
+            <input type="button" id="directSubmit" value="Parse VOTABLE" />
+        </div>
+        <div id="parsedVotable" class="hidden">
+            <h2>Parsing result</h2>
+                <table>
+                    <tr>
+                        <td>Status</td><td id="parsingStatus"></td>
+                    </tr>
+                    <tr class="hidden okStatusValue">
+                        <td>Resource URL</td><td id="resourceUrl"></td>
+                    </tr>
+                    <tr class="hidden okStatusValue">
+                        <td>Records count</td><td id="recordsCount"></td>
+                    </tr>
+                    <tr class="hidden okStatusValue">
+                        <td>Datalink available</td><td id="datalinkAvailable"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
