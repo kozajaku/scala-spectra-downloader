@@ -31,7 +31,6 @@ class SingleDownloadActor extends Actor {
 
   def receive = {
     case DownloadSpectrum(id, url, name, directory, authorization) =>
-      println(s"downloading $name - id: $id")
       try {
         val connection = new URL(url).openConnection.asInstanceOf[HttpURLConnection]
         authorization match {

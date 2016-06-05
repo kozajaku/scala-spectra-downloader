@@ -1,24 +1,28 @@
 package controllers
 
 import javax.inject._
-import play.api._
+
+import actors.SpectraDownloadingActor
+import akka.actor.{ActorRef, ActorSystem}
+import akka.stream.Materializer
 import play.api.mvc._
+import services.JobDatabase
 
-/**
- * This controller creates an `Action` to handle HTTP requests to the
- * application's home page.
- */
+import scala.concurrent.ExecutionContext
+
 @Singleton
-class HomeController @Inject() extends Controller {
+class HomeController @Inject()(database: JobDatabase, implicit val actorSystem: ActorSystem,
+                               materializer: Materializer, implicit val ec: ExecutionContext) extends Controller {
 
-  /**
-   * Create an Action to render an HTML page with a welcome message.
-   * The configuration in the `routes` file means that this method
-   * will be called when the application receives a `GET` request with
-   * a path of `/`.
-   */
+
   def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+    import utils.model.{Directory, JobInfo}
+    val someActor: ActorRef = actorSystem.actorOf(SpectraDownloadingActor.props)
+    val jobInfo: JobInfo = JobInfo(someActor, "http://blablasource.xml", 25, Directory("/some/dir"))
+    database += jobInfo
+    database += jobInfo
+    database += jobInfo
+    Ok(views.html.index(database.toArray))
   }
 
 }

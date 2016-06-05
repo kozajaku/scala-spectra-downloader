@@ -4,7 +4,7 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>749</x>
+      <x>686</x>
       <y>0</y>
       <w>203</w>
       <h>91</h>
@@ -24,7 +24,7 @@ Responsibilities
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>973</x>
+      <x>910</x>
       <y>0</y>
       <w>203</w>
       <h>98</h>
@@ -43,7 +43,7 @@ Responsibilities
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>714</x>
+      <x>651</x>
       <y>154</y>
       <w>105</w>
       <h>56</h>
@@ -58,7 +58,7 @@ VotableByDownload
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>833</x>
+      <x>770</x>
       <y>154</y>
       <w>105</w>
       <h>56</h>
@@ -73,7 +73,7 @@ VotableByUpload
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>784</x>
+      <x>721</x>
       <y>84</y>
       <w>35</w>
       <h>84</h>
@@ -84,7 +84,7 @@ VotableByUpload
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>833</x>
+      <x>770</x>
       <y>84</y>
       <w>49</w>
       <h>84</h>
@@ -95,7 +95,7 @@ VotableByUpload
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1197</x>
+      <x>1134</x>
       <y>0</y>
       <w>203</w>
       <h>98</h>
@@ -114,7 +114,7 @@ Responsibilities
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>693</x>
+      <x>630</x>
       <y>245</y>
       <w>119</w>
       <h>49</h>
@@ -129,7 +129,7 @@ DownloadFailed
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>833</x>
+      <x>770</x>
       <y>245</y>
       <w>119</w>
       <h>35</h>
@@ -142,7 +142,7 @@ ParsingFailed
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>574</x>
+      <x>511</x>
       <y>70</y>
       <w>189</w>
       <h>210</h>
@@ -153,7 +153,7 @@ ParsingFailed
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>574</x>
+      <x>511</x>
       <y>70</y>
       <w>350</w>
       <h>189</h>
@@ -164,7 +164,7 @@ ParsingFailed
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1008</x>
+      <x>945</x>
       <y>315</y>
       <w>175</w>
       <h>63</h>
@@ -181,7 +181,7 @@ Responsibilities
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>679</x>
+      <x>616</x>
       <y>315</y>
       <w>119</w>
       <h>49</h>
@@ -196,7 +196,7 @@ DownloadSuccess
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>826</x>
+      <x>763</x>
       <y>315</y>
       <w>119</w>
       <h>49</h>
@@ -211,7 +211,7 @@ ParsingSuccess
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>574</x>
+      <x>511</x>
       <y>70</y>
       <w>189</w>
       <h>287</h>
@@ -222,7 +222,7 @@ ParsingSuccess
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>574</x>
+      <x>511</x>
       <y>70</y>
       <w>336</w>
       <h>259</h>
@@ -233,7 +233,7 @@ ParsingSuccess
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1015</x>
+      <x>952</x>
       <y>196</y>
       <w>119</w>
       <h>49</h>
@@ -247,7 +247,7 @@ DownloadVotable
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1064</x>
+      <x>1001</x>
       <y>91</y>
       <w>21</w>
       <h>119</h>
@@ -258,7 +258,7 @@ DownloadVotable
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1239</x>
+      <x>1176</x>
       <y>196</y>
       <w>119</w>
       <h>49</h>
@@ -272,7 +272,7 @@ ParseVotable
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1281</x>
+      <x>1218</x>
       <y>91</y>
       <w>21</w>
       <h>119</h>
@@ -283,7 +283,7 @@ ParseVotable
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>938</x>
+      <x>875</x>
       <y>336</y>
       <w>84</w>
       <h>21</h>
@@ -294,7 +294,7 @@ ParseVotable
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>679</x>
+      <x>616</x>
       <y>399</y>
       <w>245</w>
       <h>105</h>
@@ -302,7 +302,7 @@ ParseVotable
     <panel_attributes>&lt;&lt;Actor&gt;&gt;
 actors::SpectraDownloadingActor
 -
--observers: ListBuffer[ActorRef]
+-observers: mutable.Set[ActorRef]
 -
 -
 Responsibilities
@@ -316,8 +316,8 @@ Responsibilities
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>938</x>
-      <y>539</y>
+      <x>910</x>
+      <y>497</y>
       <w>203</w>
       <h>105</h>
     </coordinates>
@@ -331,7 +331,7 @@ Responsibilities
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>595</x>
+      <x>532</x>
       <y>553</y>
       <w>238</w>
       <h>56</h>
@@ -346,20 +346,20 @@ InitiateDownloading
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>826</x>
-      <y>574</y>
-      <w>126</w>
-      <h>56</h>
+      <x>763</x>
+      <y>567</y>
+      <w>161</w>
+      <h>28</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>160.0;60.0;10.0;10.0</additional_attributes>
+    <additional_attributes>210.0;10.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1176</x>
-      <y>427</y>
-      <w>203</w>
+      <x>1274</x>
+      <y>301</y>
+      <w>252</w>
       <h>98</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Actor&gt;&gt;
@@ -376,7 +376,7 @@ Responsibilities
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>826</x>
+      <x>763</x>
       <y>371</y>
       <w>287</w>
       <h>224</h>
@@ -387,7 +387,7 @@ Responsibilities
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>595</x>
+      <x>532</x>
       <y>637</y>
       <w>238</w>
       <h>35</h>
@@ -401,7 +401,7 @@ RegisterObserver
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>553</x>
+      <x>490</x>
       <y>497</y>
       <w>189</w>
       <h>154</h>
@@ -412,7 +412,7 @@ RegisterObserver
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1197</x>
+      <x>1134</x>
       <y>553</y>
       <w>203</w>
       <h>35</h>
@@ -425,18 +425,18 @@ RegisterObserver
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1134</x>
-      <y>581</y>
-      <w>77</w>
-      <h>28</h>
+      <x>1106</x>
+      <y>546</y>
+      <w>42</w>
+      <h>56</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>90.0;10.0;10.0;20.0</additional_attributes>
+    <additional_attributes>40.0;60.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>595</x>
+      <x>532</x>
       <y>714</y>
       <w>238</w>
       <h>42</h>
@@ -451,7 +451,7 @@ SpectrumDownloadSuccess
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>875</x>
+      <x>812</x>
       <y>714</y>
       <w>238</w>
       <h>63</h>
@@ -467,7 +467,7 @@ SpectrumDownloadFailed
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>553</x>
+      <x>490</x>
       <y>497</y>
       <w>189</w>
       <h>231</h>
@@ -478,7 +478,7 @@ SpectrumDownloadFailed
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>553</x>
+      <x>490</x>
       <y>497</y>
       <w>427</w>
       <h>231</h>
@@ -489,7 +489,7 @@ SpectrumDownloadFailed
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1197</x>
+      <x>1134</x>
       <y>693</y>
       <w>245</w>
       <h>84</h>
@@ -509,7 +509,7 @@ Responsibilities
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1029</x>
+      <x>966</x>
       <y>847</y>
       <w>238</w>
       <h>98</h>
@@ -527,7 +527,7 @@ DownloadSpectrum
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1141</x>
+      <x>1078</x>
       <y>770</y>
       <w>175</w>
       <h>91</h>
@@ -538,7 +538,7 @@ DownloadSpectrum
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1197</x>
+      <x>1134</x>
       <y>616</y>
       <w>203</w>
       <h>42</h>
@@ -552,18 +552,18 @@ DownloadSpectrum
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1134</x>
-      <y>588</y>
-      <w>77</w>
-      <h>49</h>
+      <x>1106</x>
+      <y>546</y>
+      <w>42</w>
+      <h>91</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>90.0;50.0;10.0;10.0</additional_attributes>
+    <additional_attributes>40.0;110.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>336</x>
+      <x>273</x>
       <y>70</y>
       <w>133</w>
       <h>35</h>
@@ -575,7 +575,7 @@ ResolverResponse</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>238</x>
+      <x>175</x>
       <y>154</y>
       <w>133</w>
       <h>35</h>
@@ -587,7 +587,7 @@ ResolverSuccess</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>406</x>
+      <x>343</x>
       <y>154</y>
       <w>133</w>
       <h>35</h>
@@ -599,7 +599,7 @@ ResolverFailed</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>301</x>
+      <x>238</x>
       <y>98</y>
       <w>112</w>
       <h>70</h>
@@ -610,7 +610,7 @@ ResolverFailed</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>392</x>
+      <x>329</x>
       <y>98</y>
       <w>112</w>
       <h>70</h>
@@ -621,7 +621,7 @@ ResolverFailed</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>476</x>
+      <x>413</x>
       <y>182</y>
       <w>427</w>
       <h>77</h>
@@ -632,7 +632,7 @@ ResolverFailed</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>476</x>
+      <x>413</x>
       <y>182</y>
       <w>280</w>
       <h>77</h>
@@ -643,7 +643,7 @@ ResolverFailed</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>301</x>
+      <x>238</x>
       <y>182</y>
       <w>637</w>
       <h>147</h>
@@ -654,44 +654,47 @@ ResolverFailed</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>350</x>
-      <y>637</y>
-      <w>147</w>
-      <h>35</h>
+      <x>287</x>
+      <y>616</y>
+      <w>154</w>
+      <h>70</h>
     </coordinates>
-    <panel_attributes>&lt;&lt;case object&gt;&gt;
-Yes
--</panel_attributes>
+    <panel_attributes>&lt;&lt;case class&gt;&gt;
+DownloadStateResponse
+-
++successful: Int
++failed: Int
++remaining: Int</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>420</x>
+      <x>357</x>
       <y>497</y>
       <w>322</w>
-      <h>154</h>
+      <h>133</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>440.0;10.0;440.0;40.0;10.0;40.0;10.0;200.0</additional_attributes>
+    <additional_attributes>440.0;10.0;440.0;40.0;10.0;40.0;10.0;170.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>175</x>
+      <x>112</x>
       <y>637</y>
       <w>147</w>
       <h>35</h>
     </coordinates>
     <panel_attributes>&lt;&lt;case object&gt;&gt;
-No
+AskDownloadState
 -</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>238</x>
+      <x>175</x>
       <y>497</y>
       <w>504</w>
       <h>154</h>
@@ -702,59 +705,53 @@ No
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>259</x>
-      <y>553</y>
-      <w>154</w>
+      <x>791</x>
+      <y>637</y>
+      <w>238</w>
       <h>35</h>
     </coordinates>
-    <panel_attributes>&lt;&lt;trait&gt;&gt;
-DownloadFinishedResponse</panel_attributes>
+    <panel_attributes>&lt;&lt;case object&gt;&gt;
+UnregisterObserver
+-
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>259</x>
-      <y>581</y>
-      <w>91</w>
-      <h>70</h>
+      <x>490</x>
+      <y>497</y>
+      <w>448</w>
+      <h>154</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
-    <additional_attributes>110.0;10.0;110.0;50.0;10.0;50.0;10.0;80.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>329</x>
-      <y>581</y>
-      <w>77</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;50.0;90.0;50.0;90.0;80.0</additional_attributes>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>250.0;10.0;250.0;40.0;10.0;40.0;10.0;180.0;620.0;180.0;620.0;200.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>350</x>
-      <y>728</y>
-      <w>147</w>
-      <h>35</h>
+      <x>1344</x>
+      <y>490</y>
+      <w>154</w>
+      <h>70</h>
     </coordinates>
-    <panel_attributes>&lt;&lt;case object&gt;&gt;
-IsDownloadFinished
--</panel_attributes>
+    <panel_attributes>&lt;&lt;case class&gt;&gt;
+CurrentDownloadingState
+-
++urls: Array[String]
++state: Array[DownloadState]
++exceptions: Array[Option[Exception]]</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>441</x>
-      <y>497</y>
-      <w>301</w>
-      <h>245</h>
+      <x>1414</x>
+      <y>392</y>
+      <w>21</w>
+      <h>112</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>410.0;10.0;410.0;40.0;130.0;40.0;130.0;280.0;10.0;280.0;10.0;330.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;140.0</additional_attributes>
   </element>
 </diagram>

@@ -1,20 +1,48 @@
-@*
- * This template takes a single argument, a String containing a
- * message to display.
- *@
-@(message: String)
+@import utils.model.JobInfo
 
-@*
- * Call the `main` template with two arguments. The first
- * argument is a `String` with the title of the page, the second
- * argument is an `Html` object containing the body of the page.
- *@
-@main("Welcome to Play") {
+@(jobs: Array[JobInfo])
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Spectra downloader</title>
+        <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script>
+                //on document ready ask for job states
+                $(function(){
+                    var jobCount = @jobs.length;
+                    $.get("@routes.ApiController.jobStates", function(json){
+                        var dataArr = json.jobs;
+                        for (var i = 0; i < jobCount && i < dataArr.length; i++){
+                            var target = dataArr[i].id;
+                            var span = $("#asyncJobState" + target);
+                            if (dataArr[i].finished){
+                                span.removeClass("stateAsking");
+                                span.addClass("stateCompleted");
+                                span.text("Completed");
+                            } else {
+                                span.removeClass("stateAsking");
+                                span.addClass("stateRunning");
+                                span.text("Running");
+                            }
+                        }
+                    });
+                });
+        </script>
+    </head>
+    <body>
+        @* And here's where we render the `Html` object containing
+        * the page content. *@
+        <h1>Spectra downloader</h1>
+        <div id="recentDownloads">
+            <h2>Recent download jobs</h2>
+            <div id="jobListTable">
+            @jobListTable(jobs)
+            </div>
+        </div>
+        <div id="createNewJob">
+            <h2><a href="@routes.CreateNewJobController.index">Create new job</a></h2>
+        </div>
+    </body>
+</html>
 
-    @*
-     * Get an `Html` object by calling the built-in Play welcome
-     * template and passing a `String` message.
-     *@
-    @play20.welcome(message, style = "Scala")
-
-}

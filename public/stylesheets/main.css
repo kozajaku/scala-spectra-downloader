@@ -1,0 +1,25 @@
+span.stateAsking {
+    font-style: italic;
+}
+
+span.stateCompleted {
+    color: green;
+    font-weight: bold;
+}
+
+span.stateRunning {
+    font-weight: bold;
+    color: coral;
+}
+
+.headerRow {
+
+}
+
+#recentDownloads {
+
+}
+
+#createNewJob {
+
+}

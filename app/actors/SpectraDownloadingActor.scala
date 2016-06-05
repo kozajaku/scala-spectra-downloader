@@ -1,5 +1,6 @@
 package actors
 
+import actors.DownloadObserverActor.CurrentDownloadingState
 import akka.actor.{Actor, ActorRef, PoisonPill, Props}
 import utils.model.SpectraDownloadConfiguration
 import utils.parser.model.IndexedSSAPVotable
@@ -14,17 +15,15 @@ object SpectraDownloadingActor {
 
   case object RegisterObserver
 
+  case object UnregisterObserver
+
   case class SpectrumDownloadSuccess(id: Int)
 
   case class SpectrumDownloadFailed(id: Int, ex: Exception)
 
-  case object IsDownloadFinished
+  case object AskDownloadState
 
-  trait DownloadFinishedResponse
-
-  case object Yes extends DownloadFinishedResponse
-
-  case object No extends DownloadFinishedResponse
+  case class DownloadStateResponse(successful: Int, failed: Int, remaining: Int)
 
   object DownloadState extends Enumeration {
     type DownloadState = Value
@@ -42,7 +41,7 @@ class SpectraDownloadingActor extends Actor {
 
   private val spectra: mutable.ArrayBuffer[SpectrumRepresentation] = mutable.ArrayBuffer()
   private var completed: Int = 0
-  private val observers: mutable.ListBuffer[ActorRef] = mutable.ListBuffer()
+  private val observers: mutable.Set[ActorRef] = mutable.Set()
   private val exceptions: mutable.Map[Int, Exception] = mutable.Map()
 
   def receive = {
@@ -58,27 +57,27 @@ class SpectraDownloadingActor extends Actor {
       }
     case RegisterObserver =>
       observers += sender()
-    //TODO send current state
+      val state = CurrentDownloadingState(spectra.map(_.url).toArray, spectra.map(_.state).toArray, spectra.indices.map(exceptions.get).toArray)
+      sender() ! state
+    case UnregisterObserver =>
+      observers -= sender()
     case SpectrumDownloadSuccess(id) =>
       val oldRepr = spectra(id)
       spectra(id) = SpectrumRepresentation(oldRepr.url, oldRepr.suggestedName, DownloadState.Success)
       completed += 1
       if (finished) sender() ! PoisonPill
-    //inform all observers
-    //TODO implement observer messages
+      //inform all observers
+      observers.foreach(_ ! SpectrumDownloadSuccess(id))
     case SpectrumDownloadFailed(id, ex) =>
       val oldRepr = spectra(id)
       spectra(id) = SpectrumRepresentation(oldRepr.url, oldRepr.suggestedName, DownloadState.Failed)
       exceptions.put(id, ex)
       completed += 1
       if (finished) sender() ! PoisonPill
-    //inform all observers
-    //TODO implement observer messages
-    case IsDownloadFinished =>
-      if (finished)
-        sender() ! Yes
-      else
-        sender() ! No
+      //inform all observers
+      observers.foreach(_ ! SpectrumDownloadFailed(id, ex))
+    case AskDownloadState =>
+      sender() ! DownloadStateResponse(completed - exceptions.size, exceptions.size, spectra.size - completed)
   }
 
   private def finished = completed == spectra.size
