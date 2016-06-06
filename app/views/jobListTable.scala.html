@@ -1,54 +1,58 @@
 @import utils.model.JobInfo
 @(jobs: Array[JobInfo])
 
-@displayJobRow(job: JobInfo, index: Int) = {
-<tr>
-    <td>
-        @job.votableSource
-    </td>
-    <td>
-        @job.created.format("HH:mm:ss")
-    </td>
-    <td>
-        @job.recordsCount
-    </td>
-    <td>
-        @job.directory.path
-    </td>
-    <td>
-        <span class="stateAsking" id="asyncJobState@index">Asking...</span>
-    </td>
-    <td>
-        <a href="@routes.JobDetailsController.jobDetails(index)">Show details</a>
-    </td>
-</tr>
-}
-@defining(jobs.zipWithIndex) { indexedJobs =>
-    @if(jobs.isEmpty) {
-        <h3>No recent jobs</h3>
-    } else {
-        <table>
-            <tr class="headerRow">
-                <th>
-                    URL
-                </th>
-                <th>
-                    Created
-                </th>
-                <th>
-                    Records count
-                </th>
-                <th>
-                    Target directory
-                </th>
-                <th>
-                    State
-                </th>
-                <th>
-                    Action
-                </th>
-            </tr>
-            @for(ij <- indexedJobs) {@displayJobRow(ij._1, ij._2)}
-        </table>
+    @displayJobRow(job: JobInfo, index: Int) = {
+        <tr>
+            <td>
+            @if(job.votableSource.isEmpty) {
+                unknown
+            } else {
+                <a href="@job.votableSource.get">@job.votableSource.get</a>
+            }
+            </td>
+            <td>
+            @job.created.format("HH:mm:ss")
+            </td>
+            <td>
+            @job.recordsCount
+            </td>
+            <td>
+            @job.directory.path
+            </td>
+            <td>
+                <span class="stateAsking" id="asyncJobState@index">Asking&hellip;</span>
+            </td>
+            <td>
+                <a href="@routes.JobDetailsController.jobDetails(index)">Show details</a>
+            </td>
+        </tr>
     }
-}
+    @defining(jobs.zipWithIndex) { indexedJobs =>
+        @if(jobs.isEmpty) {
+            <h3>No recent jobs</h3>
+        } else {
+            <table>
+                <tr class="headerRow">
+                    <th>
+                        URL
+                    </th>
+                    <th>
+                        Created
+                    </th>
+                    <th>
+                        Records
+                    </th>
+                    <th>
+                        Target directory
+                    </th>
+                    <th>
+                        State
+                    </th>
+                    <th>
+                        Action
+                    </th>
+                </tr>
+                @for(ij <- indexedJobs) {@displayJobRow(ij._1, ij._2)}
+            </table>
+        }
+    }

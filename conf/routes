@@ -4,10 +4,6 @@
 
 # An example controller showing a sample home page
 GET         /                            controllers.HomeController.index
-# An example controller showing how to use dependency injection
-GET         /count                       controllers.CountController.count
-# An example controller showing how to write asynchronous code
-GET         /message                     controllers.AsyncController.message
 
 GET         /create                      controllers.CreateNewJobController.index
 
@@ -21,6 +17,7 @@ POST        /api/votable-direct          controllers.CreateNewJobController.dire
 
 POST        /api/enqueue-job             controllers.CreateNewJobController.enqueueNewJob
 
+GET         /api/ws-details/:id          controllers.JobDetailsController.socket(id: Int)
 
 
 POST        /test                        controllers.CreateNewJobController.test

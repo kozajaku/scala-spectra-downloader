@@ -17,6 +17,21 @@ span.stateRunning {
     font-weight: bold;
 }
 
+.spectraStateSuccess {
+    font-weight: bold;
+    color: green;
+}
+
+.spectraStatePending {
+    font-weight: bold;
+    color: coral;
+}
+
+.spectraStateFailed {
+    font-weight: bold;
+    color: red;
+}
+
 .headerRow {
 
 }

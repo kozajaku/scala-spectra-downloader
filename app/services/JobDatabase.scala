@@ -21,5 +21,9 @@ class JobDatabase {
     id
   }
 
+  def apply(index: Int): JobInfo = {
+    jobs(index)
+  }
+
   def toArray: Array[JobInfo] = jobs.toArray
 }

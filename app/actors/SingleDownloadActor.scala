@@ -50,7 +50,7 @@ class SingleDownloadActor extends Actor {
         val directoryFile = new File(directory.path)
         directoryFile.mkdirs()
         val outputFile = new File(directoryFile, fileName)
-        if (!outputFile.createNewFile()) throw new Exception(s"File with name $fileName already exists")
+        if (outputFile.exists()) throw new Exception(s"File with name $fileName already exists")
         val output = new BufferedOutputStream(new FileOutputStream(outputFile))
         val byteArray = Stream.continually(connection.getInputStream.read).takeWhile(-1 != _).map(_.toByte).toArray
         output.write(byteArray)

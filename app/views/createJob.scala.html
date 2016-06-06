@@ -138,7 +138,7 @@
                         data: json,
                         contentType: "application/json"
                     }).success(function(json){
-                        location = "/job-details/" + json.jobId;
+                        window.location = "/job-details/" + json.jobId;
                     });
                 }
                 //on document ready ask for job states

@@ -1,0 +1,193 @@
+@import utils.model.JobInfo
+@(job: JobInfo)(wsUrl: String)
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Job details</title>
+        <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script>
+                var state;
+                var total = @job.recordsCount;
+                var remaining, failed;
+                var socket;
+                function stateSpan(state){
+                    switch (state) {
+                        case "SUCCESS": return $("<span class=\"spectraStateSuccess\">Success</span>");
+                        case "FAILED" : return $("<span class=\"spectraStateFailed\">Failed</span>");
+                        case "PENDING": return $("<span class=\"spectraStatePending\">Pending</span>");
+                    }
+                }
+
+                function urlSpan(url){
+                    return $("<a href=\"" + url + "\">" +  url  + "</a>");
+                }
+
+                function exceptionSpan(ex){
+                    if (ex){
+                        return $("<span class=\"message\">" + ex + "</span>");
+                    }
+                    //else
+                    return $();
+                }
+
+                function setupPageState(){
+                    //setup state
+                    if (remaining > 0){
+                        $("#stateSpan").removeClass("stateAsking").addClass("stateRunning").text("Running");
+                    } else {
+                        $("#stateSpan").removeClass("stateAsking").addClass("stateCompleted").text("Completed");
+                    }
+                    //setup remaining
+                    $("#remainingSpan").removeClass("stateAsking").text(remaining);
+                    //setup failed
+                    $("#failedSpan").removeClass("stateAsking").text(failed);
+                    //construct spectra table
+                    var table = $("#spectraTable");
+                    for (var i = 0; i < state.length; i++){
+                        var row = $("<tr id=\"spectrumRow" + i + "\"></tr>");
+                        row.append($("<td></td>").append(stateSpan(state[i].state)));
+                        row.append($("<td></td>").append(urlSpan(state[i].url)));
+                        row.append($("<td></td>").append(exceptionSpan(state[i].exception)));
+                        table.append(row);
+                    }
+                }
+
+                function notifyPageState(id){
+                    //setup state
+                    if (remaining > 0){
+                        $("#stateSpan").removeClass("stateAsking").addClass("stateRunning").text("Running");
+                    } else {
+                        $("#stateSpan").removeClass("stateAsking").removeClass("stateRunning").addClass("stateCompleted").text("Completed");
+                    }
+                    //setup remaining
+                    $("#remainingSpan").removeClass("stateAsking").text(remaining);
+                    //setup failed
+                    $("#failedSpan").removeClass("stateAsking").text(failed);
+                    var spectrum = state[id];
+                    var tableRow = $("#spectrumRow" + id);
+                    tableRow.children("td").eq(0).empty().append(stateSpan(spectrum.state));
+                    tableRow.children("td").eq(2).empty().append(exceptionSpan(spectrum.exception));
+                }
+
+                $(function(){
+                    socket = new WebSocket("@wsUrl");
+                    socket.onerror = function(){
+                        alert("You were disconnected from the server. Please refresh this page");
+                    };
+                    socket.onopen = function(){
+                        $(".connecting").addClass("hidden");
+                        $(".connected").removeClass("hidden");
+                    };
+                    socket.onmessage = function(wsMsg){
+                        var msg = JSON.parse(wsMsg.data);
+                        if (msg.messageType == "total"){
+                            //load initial state
+                            state = msg.spectraState;
+                            remaining = 0;
+                            failed = 0;
+                            for (var i = 0; i < state.length; i++){
+                                if (state[i].state == "PENDING") remaining++;
+                                if (state[i].state == "FAILED")  failed++;
+                            }
+                            //set page values from the current state
+                            setupPageState();
+                        } else if (msg.messageType == "update"){
+                            var specific = state[msg.spectraState.id];
+                            specific["state"] = msg.spectraState.state;
+                            specific["exception"] = msg.spectraState.exception;
+                            if (msg.spectraState.state == "FAILED") failed++;
+                            remaining--;
+                            notifyPageState(msg.spectraState.id);
+                        }
+                    };
+                });
+        </script>
+    </head>
+    <body>
+        <h1>Job details</h1>
+        <a class="backToHome" href="@routes.HomeController.index()">Back to the main page</a>
+        <div class="connecting">
+            <h3>Establishing connection...</h3>
+        </div>
+        <div class="connected hidden">
+            <h2>Download job parameters</h2>
+            <table>
+                <tr>
+                    <td>
+                        URL
+                    </td>
+                    <td>
+                    @if(job.votableSource.isEmpty) {
+                        unknown
+                    } else {
+                        <a href="@job.votableSource.get">@job.votableSource.get</a>
+                    }
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Created
+                    </td>
+                    <td>
+                    @job.created.format("HH:mm:ss")
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Target directory
+                    </td>
+                    <td>
+                    @job.directory.path
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        State
+                    </td>
+                    <td>
+                        <span class="stateAsking" id="stateSpan">Asking&hellip;</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Total spectra count
+                    </td>
+                    <td>
+                    @job.recordsCount
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Remaining
+                    </td>
+                    <td>
+                        <span class="stateAsking" id="remainingSpan">Asking&hellip;</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Failed
+                    </td>
+                    <td>
+                        <span class="stateAsking" id="failedSpan">Asking&hellip;</span>
+                    </td>
+                </tr>
+
+            </table>
+
+            <h2>Spectra download progress</h2>
+            <table class="spectraTable" id="spectraTable">
+                <tr>
+                    <th>State</th>
+                    <th>Resource</th>
+                    <th>Message</th>
+                </tr>
+            </table>
+            <div id="createNewJob">
+                <h2><a href="@routes.CreateNewJobController.index">Create new job</a></h2>
+            </div>
+        </div>
+    </body>
+</html>
+

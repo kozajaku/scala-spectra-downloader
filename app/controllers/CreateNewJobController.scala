@@ -85,20 +85,21 @@ class CreateNewJobController @Inject()(database: JobDatabase, implicit val actor
       case Some(json) =>
         import utils.model.JobInfo
         val downloader = actorSystem.actorOf(SpectraDownloadingActor.props)
-        val url: Option[String] = if ((json \ "urlKnown").get == JsBoolean(true)) Option((json \ "url").get.as[String]) else None
+        val url: Option[String] = if ((json \ "urlKnown").get.as[Boolean]) Option((json \ "url").get.as[String]) else None
         val targetVotable = parsedMap((json \ "id").get match {
           case JsNumber(idd) => idd.toInt
         })
         val dir = Directory((json \ "directory").get.as[String])
+        recentDirectory = dir.path
         val job = JobInfo(downloader, url, targetVotable.getRows.size, dir)
         val id = database.addNewJob(job)
-        val auth: Option[Authorization] = if ((json \ "authorizationUsed") == JsBoolean(true)) {
-          Option(Authorization((json \ "authorization" \ "username").get.as[String],
+        val auth: Option[Authorization] = if ((json \ "authorizationUsed").get.as[Boolean]) {
+          Some(Authorization((json \ "authorization" \ "username").get.as[String],
             (json \ "authorization" \ "password").get.as[String]))
         } else None
-        val datalink: Option[DatalinkConfig] = if ((json \ "datalinkUsed") == JsBoolean(true)){
-          Option(DatalinkConfig(
-            (json \ "datalink").get.as[List[JsArray]].map{arr =>
+        val datalink: Option[DatalinkConfig] = if ((json \ "datalinkUsed").get.as[Boolean]) {
+          Some(DatalinkConfig(
+            (json \ "datalink").get.as[List[JsArray]].map { arr =>
               arr(0).get.as[String] -> arr(1).get.as[String]
             }
           ))
