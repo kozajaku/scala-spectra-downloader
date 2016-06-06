@@ -18,7 +18,7 @@ class HomeController @Inject()(database: JobDatabase, implicit val actorSystem: 
   def index = Action {
     import utils.model.{Directory, JobInfo}
     val someActor: ActorRef = actorSystem.actorOf(SpectraDownloadingActor.props)
-    val jobInfo: JobInfo = JobInfo(someActor, "http://blablasource.xml", 25, Directory("/some/dir"))
+    val jobInfo: JobInfo = JobInfo(someActor, Option("http://blablasource.xml"), 25, Directory("/some/dir"))
     database += jobInfo
     database += jobInfo
     database += jobInfo

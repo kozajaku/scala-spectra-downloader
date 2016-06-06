@@ -19,6 +19,8 @@ POST        /api/votable-download        controllers.CreateNewJobController.down
 
 POST        /api/votable-direct          controllers.CreateNewJobController.directVotableInput
 
+POST        /api/enqueue-job             controllers.CreateNewJobController.enqueueNewJob
+
 
 
 POST        /test                        controllers.CreateNewJobController.test

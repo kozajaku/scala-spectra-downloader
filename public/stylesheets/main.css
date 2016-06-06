@@ -2,7 +2,7 @@ span.stateAsking {
     font-style: italic;
 }
 
-span.stateCompleted {
+.statusOk, span.stateCompleted {
     color: green;
     font-weight: bold;
 }
@@ -10,6 +10,11 @@ span.stateCompleted {
 span.stateRunning {
     font-weight: bold;
     color: coral;
+}
+
+.statusFail {
+    color: red;
+    font-weight: bold;
 }
 
 .headerRow {

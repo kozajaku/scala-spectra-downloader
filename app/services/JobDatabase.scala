@@ -15,5 +15,11 @@ class JobDatabase {
     this
   }
 
+  def addNewJob(jobInfo: JobInfo): Int = {
+    val id = jobs.length
+    this += jobInfo
+    id
+  }
+
   def toArray: Array[JobInfo] = jobs.toArray
 }

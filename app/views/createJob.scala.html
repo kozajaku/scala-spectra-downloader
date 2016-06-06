@@ -7,33 +7,146 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script>
                 var currentVotableSession;
+                var urlKnown;
+                var urlAddr;
+                var datalinkAvailable;
+                function addInputRow(table, input){
+                    var row = $("<tr></tr>");
+                    row.append($("<td>" + input.name + ":</td>"));
+                    row.append($("<td></td>").append("<input type=\"text\" class=\"datalinkInput\" name=\"" + input.name + "\"/>"));
+                    table.append(row);
+                }
+
+                function addOptionsRow(table, input){
+                    var row = $("<tr></tr>");
+                    row.append($("<td>" + input.name + ":</td>"));
+                    var select = $("<select class=\"datalinkInput\" name=\"" + input.name + "\"></select>");
+                    for (var i = 0; i < input.options.length; i++){
+                        select.append($("<option value=\"" + input.options[i][1] + "\">" + input.options[i][0] + "</option>"));
+                    }
+                    row.append($("<td></td>").append(select));
+                    table.append(row);
+                }
+
+                function constructDatalinkOptions(options){
+                    var table = $("#datalinkOptionsTable");
+                    table.empty();//remove all subelements
+                    for (var i = 0; i < options.length; i++){
+                        if (options[i].optionsSet){
+                            addOptionsRow(table, options[i]);
+                        } else {
+                            addInputRow(table, options[i]);
+                        }
+                    }
+                }
+
                 function displayParsedData(json){
-                    $("#parsedVotable").removeClass("hidden");
+                    $(".unparsedVotable").addClass("hidden");
+                    $(".parsedVotable").removeClass("hidden");
                     //set status
                     if (json.status == "ok"){
                         currentVotableSession = json.id;
-                        $("#parsingStatus").text("OK");
+                        $("#parsingStatus").text("OK").removeClass("statusFail").addClass("statusOk");
                         $(".okStatusValue").removeClass("hidden");
                     } else {
-                        $("#parsingStatus").text(json.message);
+                        $("#parsingStatus").text(json.message).removeClass("statusOk").addClass("statusFail");
                         $(".okStatusValue").addClass("hidden");
                         return;
                     }
                     //resource url
                     var url = $("#resourceUrl");
-                    if (!json.url){
+                    if (!json.parsedData.url){
                         url.text("Not available");
+                        url.prop("href","");
+                        urlKnown = false;
                     } else {
-                        url.text(json.url);
+                        url.text(json.parsedData.url);
+                        url.prop("href", json.parsedData.url);
+                        urlKnown = true;
+                        urlAddr = json.parsedData.url;
                     }
                     //records count
-                    $("#recordsCount").text(json.recordCount);
+                    $("#recordsCount").text(json.parsedData.recordCount);
                     //datalink availability
-                    $("#datalinkAvailable").text(json.datalinkAvailable ? "yes" : "no");
+                    $("#datalinkAvailable").text(json.parsedData.datalinkAvailable ? "yes" : "no");
+                    datalinkAvailable = json.parsedData.datalinkAvailable;
+                    if (json.parsedData.datalinkAvailable){
+                        $(".datalinkAvailable").removeClass("hidden");
+                        constructDatalinkOptions(json.parsedData.datalinkOptions);
+                    } else {
+                        $(".datalinkAvailable").addClass("hidden");
+                    }
+                    //recent directory
+                    $("#directoryInput").val(json.directory);
+                }
+
+                function enqueueNewJob(){
+                    @*json example
+                     *
+                     * {
+                     *   "id" = 1, //votable session id
+                     *   "urlKnown" = true,
+                     *   "url" = "http://example.org/example/path.xml?bla=blabla",//url of votable source
+                     *   "authorizationUsed" = true,
+                     *   "authorization" = {
+                     *     "username" = "Franta",
+                     *     "password" = "JetelSecret"
+                     *   },
+                     *   "datalinkUsed" = true,
+                     *   "datalink" = [
+                     *     ["LAMBDA_MIN", "25"],
+                     *     ["FORMAT", "text/plain"]
+                     *   ],
+                     *   "directory" = "/home/someone/folder1/folder2"
+                     * }
+                     *
+                     *@
+                    var map = {
+                        id: currentVotableSession,
+                        urlKnown: urlKnown
+                    };
+                    if (urlKnown){
+                        map["url"] = urlAddr
+                    }
+                    var authUsed = $("#useAuthorization").prop("checked");
+                    map["authorizationUsed"] = authUsed;
+                    if (authUsed){
+                        var auth = {
+                            username: $("#authUsername").val().trim(),
+                            password: $("#authPassword").val().trim()
+                        };
+                        map["authorization"] = auth;
+                    }
+                    var solveDatalink = datalinkAvailable && $("#useDatalinkInput").prop("checked");
+                    map["datalinkUsed"] = solveDatalink;
+                    if (solveDatalink){
+                        var datalink = [];
+                        $(".datalinkInput").each(function() {
+                            var value = $(this).val().trim();
+                            var name = $(this).prop("name").trim();
+                            if (value != ""){
+                                datalink.push([name, value]);
+                            }
+                        });
+                        map["datalink"] = datalink;
+                    }
+                    map["directory"] = $("#directoryInput").val();
+                    var json = JSON.stringify(map);
+                    $.ajax({
+                        type: "POST",
+                        url: "@routes.CreateNewJobController.enqueueNewJob",
+                        data: json,
+                        contentType: "application/json"
+                    }).success(function(json){
+                        location = "/job-details/" + json.jobId;
+                    });
                 }
                 //on document ready ask for job states
                 $(function(){
                     $("input[type=radio][name=choice]").first().prop("checked", true);
+                    $("#useAuthorization").prop("checked", false);
+                    $("#useDatalinkInput").prop("checked", true);
+                    $(".authInput").prop("disabled", true);
                     function hideAll(){
                         $("#selectionUrl").addClass("hidden");
                         $("#selectionUpload").addClass("hidden");
@@ -80,6 +193,23 @@
                             displayParsedData(data.responseJSON);
                         });
                     });
+                    //back button
+                    $("#backButton").click(function(){
+                        $(".unparsedVotable").removeClass("hidden");
+                        $(".parsedVotable").addClass("hidden");
+                    });
+                    //authorization disable handling
+                    $("#useAuthorization").change(function(){
+                        $(".authInput").prop("disabled", !$(this).prop("checked"));
+                    });
+                    //datalink disable handling
+                    $("#useDatalinkInput").change(function(){
+                        $(".datalinkInput").prop("disabled", !$(this).prop("checked"));
+                    });
+                    //enqueue new job callback
+                    $("#enqueueJob").click(function(){
+                        enqueueNewJob();
+                    });
                 });
         </script>
     </head>
@@ -87,7 +217,8 @@
         @* And here's where we render the `Html` object containing
         * the page content. *@
         <h1>Create new download job</h1>
-        <div id="methodChoice">
+        <a class="backtToHome" href="@routes.HomeController.index()">Back to the main page</a>
+        <div id="methodChoice" class="unparsedVotable">
             <h2>
                 Choose VOTABLE source
             </h2>
@@ -97,26 +228,32 @@
                 <input name="choice" type="radio" value="direct">Direct VOTABLE input
             </form>
         </div>
-        <div id="selectionUrl">
-            Resource URL: <input type="text" size="70" /><br/>
-            <input type="button" id="urlSubmit" value="Download VOTABLE" />
+        <div class="unparsedVotable">
+            <h2>
+                VOTABLE input
+            </h2>
+            <div class="votableSourceChoice" id="selectionUrl">
+                Resource URL: <input type="text" size="70" /><br/>
+                <input type="button" id="urlSubmit" value="Download VOTABLE" />
+            </div>
+            <div class="votableSourceChoice hidden" id="selectionUpload">
+                upload TODO
+            </div>
+            <div class="votableSourceChoice hidden" id="selectionDirect">
+                Insert VOTABLE document:<br/>
+                <textarea id="votableArea" type="textarea" cols="80" rows="20"></textarea><br/>
+                <input type="button" id="directSubmit" value="Parse VOTABLE" />
+            </div>
         </div>
-        <div class="hidden" id="selectionUpload">
-            upload TODO
-        </div>
-        <div class="hidden" id="selectionDirect">
-            Insert VOTABLE document:<br/>
-            <textarea id="votableArea" type="textarea" cols="80" rows="20"></textarea><br/>
-            <input type="button" id="directSubmit" value="Parse VOTABLE" />
-        </div>
-        <div id="parsedVotable" class="hidden">
-            <h2>Parsing result</h2>
+        <div class="hidden parsedVotable">
+            <div id="parsingResult">
+                <h2>Parsing result</h2>
                 <table>
                     <tr>
                         <td>Status</td><td id="parsingStatus"></td>
                     </tr>
                     <tr class="hidden okStatusValue">
-                        <td>Resource URL</td><td id="resourceUrl"></td>
+                        <td>Resource URL</td><td><a id="resourceUrl"></a></td>
                     </tr>
                     <tr class="hidden okStatusValue">
                         <td>Records count</td><td id="recordsCount"></td>
@@ -125,7 +262,45 @@
                         <td>Datalink available</td><td id="datalinkAvailable"></td>
                     </tr>
                 </table>
+                <button id="backButton">Back to VOTABLE input</button>
             </div>
+            <div id="authorization" class="okStatusValue hidden">
+                <h2>Authorization</h2>
+                <table>
+                    <tr>
+                        <td>Use authorization:</td><td><input type="checkbox" id="useAuthorization" /></td>
+                    </tr>
+                    <tr>
+                        <td>Username:</td><td><input class="authInput" type="text" id="authUsername" disabled/></td>
+                    </tr>
+                    <tr>
+                        <td>Password:</td><td><input class="authInput" type="password" id="authPassword" disabled/></td>
+                    </tr>
+
+                </table>
+            </div>
+            <div id="datalink" class="okStatusValue datalinkAvailable hidden">
+                <h2>Datalink protocol options</h2>
+                <table>
+                    <tr>
+                        <td>Use datalink:</td><td>
+                        <input type="checkbox" id="useDatalinkInput" checked></td>
+                    </tr>
+                </table>
+                <table id="datalinkOptionsTable" class="useDatalink">
+
+                </table>
+            </div>
+            <div id="directory" class="okStatusValue hidden">
+                <h2>Directory selection</h2>
+                <table>
+                    <tr>
+                        <td>Target directory:</td>
+                        <td><input type="text" id="directoryInput" size="60"/></td>
+                    </tr>
+                </table>
+            </div>
+            <button id="enqueueJob" class="okStatusValue hidden">Enqueue downloading job</button>
         </div>
     </body>
 </html>

@@ -2,16 +2,17 @@ package controllers
 
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject._
+
 import actors.SpectraDownloadingActor
-import akka.actor.{PoisonPill, ActorRef, ActorSystem}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.Materializer
 import play.api.libs.json._
 import play.api.mvc._
 import services.JobDatabase
-import utils.model.{SpectraDownloadConfiguration, Directory, DatalinkConfig, Authorization}
+import utils.model.{DatalinkConfig, Authorization, Directory, SpectraDownloadConfiguration}
 import utils.parser.model.IndexedSSAPVotable
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by radiokoza on 3.6.16.
@@ -22,14 +23,16 @@ class CreateNewJobController @Inject()(database: JobDatabase, implicit val actor
   import actors.VotableResolverActor
   import akka.pattern.ask
   import akka.util.Timeout
-  import scala.concurrent.duration._
+
   import scala.collection.mutable
+  import scala.concurrent.duration._
 
   implicit val timeout = Timeout(5.seconds)
 
   val votableResolverActor: ActorRef = actorSystem.actorOf(VotableResolverActor.props)
   val parsedMap: mutable.Map[Int, IndexedSSAPVotable] = mutable.Map()
   val counter = new AtomicInteger()
+  var recentDirectory: String = new java.io.File("").getAbsolutePath
 
   def index = Action {
     Ok(views.html.createJob())
@@ -57,25 +60,55 @@ class CreateNewJobController @Inject()(database: JobDatabase, implicit val actor
     }
   }
 
-  def directVotableInput = Action.async {request =>
+  def directVotableInput = Action.async { request =>
     import VotableResolverActor._
     val input: String = request.body.asText.getOrElse("").trim
-    if (input == "") Future {
-      BadRequest(invalidUrl)
-    } else {
-      (votableResolverActor ? VotableByUpload(input)).mapTo[ResolverResponse].map {
-        case ParsingSuccess(votable) =>
-          if (votable.getQueryStatus == "OK") {
-            val parsedId = counter.getAndIncrement()
-            parsedMap.put(parsedId, votable)
-            Ok(parsingSuccess(parsedId, votable, None))
-          }
-          else BadRequest(badQueryStatus(votable.getQueryStatus))
-        case DownloadFailed(ex) =>
-          BadRequest(downloadFailed(ex))
-        case ParsingFailed =>
-          BadRequest(parsingFailed)
-      }
+    (votableResolverActor ? VotableByUpload(input)).mapTo[ResolverResponse].map {
+      case ParsingSuccess(votable) =>
+        if (votable.getQueryStatus == "OK") {
+          val parsedId = counter.getAndIncrement()
+          parsedMap.put(parsedId, votable)
+          Ok(parsingSuccess(parsedId, votable, None))
+        }
+        else BadRequest(badQueryStatus(votable.getQueryStatus))
+      case DownloadFailed(ex) =>
+        BadRequest(downloadFailed(ex))
+      case ParsingFailed =>
+        BadRequest(parsingFailed)
+    }
+  }
+
+  def enqueueNewJob = Action { request =>
+    val jsonOpt: Option[JsValue] = request.body.asJson
+    jsonOpt match {
+      case None => BadRequest("Invalid format")
+      case Some(json) =>
+        import utils.model.JobInfo
+        val downloader = actorSystem.actorOf(SpectraDownloadingActor.props)
+        val url: Option[String] = if ((json \ "urlKnown").get == JsBoolean(true)) Option((json \ "url").get.as[String]) else None
+        val targetVotable = parsedMap((json \ "id").get match {
+          case JsNumber(idd) => idd.toInt
+        })
+        val dir = Directory((json \ "directory").get.as[String])
+        val job = JobInfo(downloader, url, targetVotable.getRows.size, dir)
+        val id = database.addNewJob(job)
+        val auth: Option[Authorization] = if ((json \ "authorizationUsed") == JsBoolean(true)) {
+          Option(Authorization((json \ "authorization" \ "username").get.as[String],
+            (json \ "authorization" \ "password").get.as[String]))
+        } else None
+        val datalink: Option[DatalinkConfig] = if ((json \ "datalinkUsed") == JsBoolean(true)){
+          Option(DatalinkConfig(
+            (json \ "datalink").get.as[List[JsArray]].map{arr =>
+              arr(0).get.as[String] -> arr(1).get.as[String]
+            }
+          ))
+        } else None
+        val config: SpectraDownloadConfiguration = SpectraDownloadConfiguration(dir, auth, datalink)
+        downloader ! SpectraDownloadingActor.InitiateDownloading(targetVotable, config)
+        Ok(Json.obj(
+          "status" -> "ok",
+          "jobId" -> id
+        ))
     }
   }
 
@@ -112,6 +145,7 @@ class CreateNewJobController @Inject()(database: JobDatabase, implicit val actor
     Json.obj(
       "status" -> JsString("ok"),
       "id" -> JsNumber(parsedId),
+      "directory" -> JsString(recentDirectory),
       "parsedData" -> Json.obj(
         "url" -> url.map(JsString).getOrElse[JsValue](JsNull),
         "recordCount" -> JsNumber(votable.getRows.size),
@@ -120,8 +154,8 @@ class CreateNewJobController @Inject()(database: JobDatabase, implicit val actor
           if (!votable.isDatalinkAvailable) JsNull
           else {
             //datalink available
-            votable.getDatalinkInputParams.toList.filterNot(_.isIdParam).map{param =>
-              if (param.getOptions.isEmpty){
+            votable.getDatalinkInputParams.toList.filterNot(_.isIdParam).map { param =>
+              if (param.getOptions.isEmpty) {
                 //no options
                 Json.obj(
                   "optionsSet" -> JsBoolean(false),
@@ -132,7 +166,7 @@ class CreateNewJobController @Inject()(database: JobDatabase, implicit val actor
                 Json.obj(
                   "optionsSet" -> JsBoolean(true),
                   "name" -> JsString(param.getName),
-                  "options" -> (("Nothing selected" -> "") :: param.getOptions.toList.map(o => o.getName -> o.getValue)).map{
+                  "options" -> (("Nothing selected" -> "") :: param.getOptions.toList.map(o => o.getName -> o.getValue)).map {
                     case (k, v) => Json.arr(k, v)
                   }
                 )
