@@ -8,40 +8,57 @@
         <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script>
+            var jobCount = @jobs.length;
+            var incompleted = false;
+            function refreshState(dataArr){
+                for (var i = 0; i < jobCount && i < dataArr.length; i++){
+                    var target = dataArr[i].id;
+                    var span = $("#asyncJobState" + target);
+                    var tmp = false;
+                    if (dataArr[i].finished){
+                        span.removeClass("stateAsking").removeClass("stateRunning");
+                        span.addClass("stateCompleted");
+                        span.text("Completed");
+                    } else {
+                        tmp = true;
+                        span.removeClass("stateAsking");
+                        span.addClass("stateRunning");
+                        span.text("Running");
+                    }
+                    if (incompleted) incompleted = tmp;
+                    else if (tmp) incompleted = true;
+                    else if (tmp) incompleted = true;
+                }
+            }
                 //on document ready ask for job states
                 $(function(){
-                    var jobCount = @jobs.length;
                     $.get("@routes.ApiController.jobStates", function(json){
-                        var dataArr = json.jobs;
-                        for (var i = 0; i < jobCount && i < dataArr.length; i++){
-                            var target = dataArr[i].id;
-                            var span = $("#asyncJobState" + target);
-                            if (dataArr[i].finished){
-                                span.removeClass("stateAsking");
-                                span.addClass("stateCompleted");
-                                span.text("Completed");
-                            } else {
-                                span.removeClass("stateAsking");
-                                span.addClass("stateRunning");
-                                span.text("Running");
-                            }
+                        refreshState(json.jobs);
+                        //setup interval
+                        if (incompleted){
+                            var interval = setInterval(function(){
+                                $.get("@routes.ApiController.jobStates", function(jsonC){
+                                    refreshState(jsonC.jobs);
+                                    if (!incompleted){
+                                        clearInterval(interval);
+                                    }
+                                });
+                            }, 5000);//5 seconds
                         }
                     });
                 });
         </script>
     </head>
     <body>
-        @* And here's where we render the `Html` object containing
-        * the page content. *@
-        <h1>Spectra downloader</h1>
-        <div id="recentDownloads">
-            <h2>Recent download jobs</h2>
-            <div id="jobListTable">
-            @jobListTable(jobs)
+        <div class="content">
+            <h1>Spectra downloader</h1>
+            <div id="recentDownloads">
+                <h2>Recent download jobs</h2>
+                @jobListTable(jobs)
             </div>
-        </div>
-        <div id="createNewJob">
-            <h2><a href="@routes.CreateNewJobController.index">Create new job</a></h2>
+            <div id="createNewJob">
+                <h2><a href="@routes.CreateNewJobController.index">Create new job</a></h2>
+            </div>
         </div>
     </body>
 </html>

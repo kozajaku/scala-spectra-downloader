@@ -105,85 +105,89 @@
         </script>
     </head>
     <body>
-        <h1>Job details</h1>
-        <a class="backToHome" href="@routes.HomeController.index()">Back to the main page</a>
-        <div class="connecting">
-            <h3>Establishing connection...</h3>
-        </div>
-        <div class="connected hidden">
-            <h2>Download job parameters</h2>
-            <table>
-                <tr>
-                    <td>
-                        URL
-                    </td>
-                    <td>
-                    @if(job.votableSource.isEmpty) {
-                        unknown
-                    } else {
-                        <a href="@job.votableSource.get">@job.votableSource.get</a>
-                    }
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Created
-                    </td>
-                    <td>
-                    @job.created.format("HH:mm:ss")
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Target directory
-                    </td>
-                    <td>
-                    @job.directory.path
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        State
-                    </td>
-                    <td>
-                        <span class="stateAsking" id="stateSpan">Asking&hellip;</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Total spectra count
-                    </td>
-                    <td>
-                    @job.recordsCount
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Remaining
-                    </td>
-                    <td>
-                        <span class="stateAsking" id="remainingSpan">Asking&hellip;</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Failed
-                    </td>
-                    <td>
-                        <span class="stateAsking" id="failedSpan">Asking&hellip;</span>
-                    </td>
-                </tr>
+        <div class="content">
+            <h1>Job details</h1>
+            <a class="backToHome" href="@routes.HomeController.index()">Back to the main page</a>
+            <div class="connecting">
+                <h3>Establishing connection...</h3>
+            </div>
+            <div id="parsingResult" class="connected hidden frame">
+                <h2>Download job parameters</h2>
+                <table>
+                    <tr>
+                        <td>
+                            URL
+                        </td>
+                        <td>
+                        @if(job.votableSource.isEmpty) {
+                            unknown
+                        } else {
+                            <a href="@job.votableSource.get">@job.votableSource.get</a>
+                        }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Created
+                        </td>
+                        <td>
+                        @job.created.format("HH:mm:ss")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Target directory
+                        </td>
+                        <td>
+                        @job.directory.path
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            State
+                        </td>
+                        <td>
+                            <span class="stateAsking" id="stateSpan">Asking&hellip;</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Total spectra count
+                        </td>
+                        <td>
+                        @job.recordsCount
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Remaining
+                        </td>
+                        <td>
+                            <span class="stateAsking" id="remainingSpan">Asking&hellip;</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Failed
+                        </td>
+                        <td>
+                            <span class="stateAsking" id="failedSpan">Asking&hellip;</span>
+                        </td>
+                    </tr>
 
-            </table>
+                </table>
+            </div>
+            <div class="connected hidden frame">
 
-            <h2>Spectra download progress</h2>
-            <table class="spectraTable" id="spectraTable">
-                <tr>
-                    <th>State</th>
-                    <th>Resource</th>
-                    <th>Message</th>
-                </tr>
-            </table>
+                <h2>Spectra download progress</h2>
+                <table class="spectraTable" id="spectraTable">
+                    <tr>
+                        <th>State</th>
+                        <th>Resource</th>
+                        <th>Message</th>
+                    </tr>
+                </table>
+            </div>
             <div id="createNewJob">
                 <h2><a href="@routes.CreateNewJobController.index">Create new job</a></h2>
             </div>

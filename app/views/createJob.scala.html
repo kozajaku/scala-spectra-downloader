@@ -57,11 +57,9 @@
                     var url = $("#resourceUrl");
                     if (!json.parsedData.url){
                         url.text("Not available");
-                        url.prop("href","");
                         urlKnown = false;
                     } else {
-                        url.text(json.parsedData.url);
-                        url.prop("href", json.parsedData.url);
+                        url.empty().append($("<a></a>").text(json.parsedData.url).prop("href", json.parsedData.url));
                         urlKnown = true;
                         urlAddr = json.parsedData.url;
                     }
@@ -214,93 +212,93 @@
         </script>
     </head>
     <body>
-        @* And here's where we render the `Html` object containing
-        * the page content. *@
-        <h1>Create new download job</h1>
-        <a class="backtToHome" href="@routes.HomeController.index()">Back to the main page</a>
-        <div id="methodChoice" class="unparsedVotable">
-            <h2>
+        <div class="content">
+            <h1>Create new download job</h1>
+            <a class="backToHome" href="@routes.HomeController.index()">Back to the main page</a>
+            <div id="methodChoice" class="unparsedVotable frame">
+                <h2>
                 Choose VOTABLE source
-            </h2>
-            <form id="inputs">
-                <input name="choice" type="radio" value="url" checked>Download from URL<br/>
-                <input name="choice" type="radio" value="upload" disabled>VOTABLE Upload<br/>
-                <input name="choice" type="radio" value="direct">Direct VOTABLE input
-            </form>
-        </div>
-        <div class="unparsedVotable">
-            <h2>
+                </h2>
+                <form id="inputs">
+                    <input name="choice" type="radio" value="url" checked>Download from URL<br/>
+                    <input name="choice" type="radio" value="upload" disabled>VOTABLE Upload<br/>
+                    <input name="choice" type="radio" value="direct">Direct VOTABLE input
+                </form>
+            </div>
+            <div class="unparsedVotable frame">
+                <h2>
                 VOTABLE input
-            </h2>
-            <div class="votableSourceChoice" id="selectionUrl">
-                Resource URL: <input type="text" size="70" /><br/>
-                <input type="button" id="urlSubmit" value="Download VOTABLE" />
-            </div>
-            <div class="votableSourceChoice hidden" id="selectionUpload">
+                </h2>
+                <div class="votableSourceChoice" id="selectionUrl">
+                Resource URL: <input type="text" size="70" /> <br/>
+                    <button id="urlSubmit">Download VOTABLE</button>
+                </div>
+                <div class="votableSourceChoice hidden" id="selectionUpload">
                 upload TODO
-            </div>
-            <div class="votableSourceChoice hidden" id="selectionDirect">
+                </div>
+                <div class="votableSourceChoice hidden" id="selectionDirect">
                 Insert VOTABLE document:<br/>
-                <textarea id="votableArea" type="textarea" cols="80" rows="20"></textarea><br/>
-                <input type="button" id="directSubmit" value="Parse VOTABLE" />
+                    <textarea id="votableArea" type="textarea" cols="80" rows="20"></textarea> <br/>
+                    <button id="directSubmit">Parse VOTABLE</button>
+                </div>
             </div>
-        </div>
-        <div class="hidden parsedVotable">
-            <div id="parsingResult">
-                <h2>Parsing result</h2>
-                <table>
-                    <tr>
-                        <td>Status</td><td id="parsingStatus"></td>
-                    </tr>
-                    <tr class="hidden okStatusValue">
-                        <td>Resource URL</td><td><a id="resourceUrl"></a></td>
-                    </tr>
-                    <tr class="hidden okStatusValue">
-                        <td>Records count</td><td id="recordsCount"></td>
-                    </tr>
-                    <tr class="hidden okStatusValue">
-                        <td>Datalink available</td><td id="datalinkAvailable"></td>
-                    </tr>
-                </table>
-                <button id="backButton">Back to VOTABLE input</button>
-            </div>
-            <div id="authorization" class="okStatusValue hidden">
-                <h2>Authorization</h2>
-                <table>
-                    <tr>
-                        <td>Use authorization:</td><td><input type="checkbox" id="useAuthorization" /></td>
-                    </tr>
-                    <tr>
-                        <td>Username:</td><td><input class="authInput" type="text" id="authUsername" disabled/></td>
-                    </tr>
-                    <tr>
-                        <td>Password:</td><td><input class="authInput" type="password" id="authPassword" disabled/></td>
-                    </tr>
+            <div class="hidden parsedVotable">
+                <div id="parsingResult" class="frame">
+                    <h2>Parsing result</h2>
+                    <table>
+                        <tr>
+                            <td>Status</td> <td id="parsingStatus"></td>
+                        </tr>
+                        <tr class="hidden okStatusValue">
+                            <td>Resource URL</td> <td><span id="resourceUrl"></span></td>
+                        </tr>
+                        <tr class="hidden okStatusValue">
+                            <td>Records count</td> <td id="recordsCount"></td>
+                        </tr>
+                        <tr class="hidden okStatusValue">
+                            <td>Datalink available</td> <td id="datalinkAvailable"></td>
+                        </tr>
+                    </table>
+                    <button id="backButton">Back to VOTABLE input</button>
+                </div>
+                <div id="authorization" class="okStatusValue hidden frame">
+                    <h2>Authorization</h2>
+                    <table>
+                        <tr>
+                            <td>Use authorization:</td> <td><input type="checkbox" id="useAuthorization" /></td>
+                        </tr>
+                        <tr>
+                            <td>Username:</td> <td><input class="authInput" type="text" id="authUsername" disabled/></td>
+                        </tr>
+                        <tr>
+                            <td>Password:</td> <td><input class="authInput" type="password" id="authPassword" disabled/></td>
+                        </tr>
+
+                    </table>
+                </div>
+                <div id="datalink" class="okStatusValue datalinkAvailable hidden frame">
+                    <h2>Datalink protocol options</h2>
+                    <table>
+                        <tr>
+                            <td>Use datalink:</td> <td>
+                            <input type="checkbox" id="useDatalinkInput" checked></td>
+                        </tr>
+                    </table>
+                    <table id="datalinkOptionsTable" class="useDatalink">
 
                 </table>
+                </div>
+                <div id="directory" class="okStatusValue hidden frame">
+                    <h2>Directory selection</h2>
+                    <table>
+                        <tr>
+                            <td>Target directory:</td>
+                            <td><input type="text" id="directoryInput" size="60"/></td>
+                        </tr>
+                    </table>
+                </div>
+                <button id="enqueueJob" class="okStatusValue hidden">Enqueue downloading job</button>
             </div>
-            <div id="datalink" class="okStatusValue datalinkAvailable hidden">
-                <h2>Datalink protocol options</h2>
-                <table>
-                    <tr>
-                        <td>Use datalink:</td><td>
-                        <input type="checkbox" id="useDatalinkInput" checked></td>
-                    </tr>
-                </table>
-                <table id="datalinkOptionsTable" class="useDatalink">
-
-                </table>
-            </div>
-            <div id="directory" class="okStatusValue hidden">
-                <h2>Directory selection</h2>
-                <table>
-                    <tr>
-                        <td>Target directory:</td>
-                        <td><input type="text" id="directoryInput" size="60"/></td>
-                    </tr>
-                </table>
-            </div>
-            <button id="enqueueJob" class="okStatusValue hidden">Enqueue downloading job</button>
         </div>
     </body>
 </html>
